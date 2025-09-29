@@ -8,7 +8,9 @@ pipeline{
     stages{
         stage('git-checkout'){
             steps{
-                git branch: 'master', url: 'https://github.com/Swati-maker417/Project-1.git'
+                git branch: 'maingit', url: 'https://github.com/Swati-maker417/Project-1.git'
+            }
+        }
         stage('Build'){
             steps{
                 sh 'mvn clean install'
@@ -41,8 +43,7 @@ pipeline{
                     sh 'docker tag myapp $USERNAME/myapp:latest'
                     sh 'docker push $USERNAME/myapp:latest'
                 }
-            }
-        }
+            }            
         stage('push the dockerhub'){
             steps{
                 sh 'docker push swati954/myapp'
