@@ -1,53 +1,53 @@
 pipeline{
     agent any
+    
     tools{
-        jdk 'jdk-11'
+        jdk 'java-11'
         maven 'maven'
-        }
-
+    }
+    
     stages{
-        stage('git-checkout'){
+        stage('Git-checkout'){
             steps{
-                git branch: 'maingit', url: 'https://github.com/Swati-maker417/Project-1.git'
+                git branch: 'main' , url: 'https://github.com/Swati-maker417/Project-1.git'
             }
         }
-        stage('Build'){
-            steps{
-                sh 'mvn clean install'
-            }
-        }
-        stage('compile'){
+        stage('Code Compile'){
             steps{
                 sh 'mvn compile'
             }
         }
-        stage('test'){
+        stage('Code Package'){
             steps{
-                sh  'mvn test'
+                sh 'mvn clean install'
             }
         }
-        stage('build docker image'){
+        stage('Build and tag'){
             steps{
                 sh 'docker build -t swati954/myapp .'
             }
         }
-        stage('container the image'){
+        stage('Containerisation'){
             steps{
-                sh 'docker run -it --name mycontainer -p 9000:8080 swati954/myapp'
+                sh '''
+                docker run -it -d --name c8 -p 9008:8080 swati954/myapp
+                '''
             }
         }
-        stage('login to dockerhub'){
-            steps{
-                withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
-                    sh 'docker tag myapp $USERNAME/myapp:latest'
-                    sh 'docker push $USERNAME/myapp:latest'
-                }
-            }            
-        stage('push the dockerhub'){
+        stage('Login to Docker Hub') {
+                    steps {
+                        script {
+                            withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                                sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
+                            }
+                        }
+                    }
+        }
+         stage('Pushing image to repository'){
             steps{
                 sh 'docker push swati954/myapp'
             }
         }
-    }   
+        
+    }
 }
